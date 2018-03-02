@@ -21,7 +21,7 @@ bst.load_model(settings.ML_MODEL_PATH)
 def setup_periodic_tasks(sender, **kwargs):
     # Calls global_update
     sender.add_periodic_task(
-        60.0, #* settings.SYSTEM_UPDATE_PERIOD,
+        60.0 * settings.SYSTEM_UPDATE_PERIOD,
         global_update,
     name='Update system')
 
