@@ -1,0 +1,73 @@
+---
+# base docker-compose configuration
+version: '2'
+
+networks:
+  infranginx_default:
+    external: true
+
+services:
+
+  web:
+    build:
+      context: .
+    #command: [/docker-entrypoint.sh]
+    hostname: "zhigultoken-bot"
+    volumes:
+      - .:/app
+    networks: 
+      infranginx_default:
+        aliases:
+          - "zhigultoken-bot"
+    environment:
+      APP_DATABASE: zhigulbot
+      APP_USER: zhigulbot_user
+      APP_USER_PASSWORD: zhigulbot_password
+      APP_HOST: zhigultoken-db
+      APP_PORT: 5432
+
+  postgresql:
+    build:
+      context: dockerfiles/postgres/
+    command: [postgres, -c, shared_buffers=1GB]
+    environment:
+      APP_DATABASE: zhigulbot
+      APP_USER: zhigulbot_user
+      APP_USER_PASSWORD: zhigulbot_password
+      POSTGRES_USER: postgres
+    hostname: "zhigultoken-db"
+    networks:
+      infranginx_default:
+        aliases:
+          - "zhigultoken-db"
+
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3
+    hostname: "zhigultoken-rabbitmq"
+    networks:
+      infranginx_default:
+        aliases:
+          - "zhigultoken-rabbitmq"
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: .
+    command: celery -A tasks worker -B
+    volumes:
+       - .:/app
+    environment:
+      - C_FORCE_ROOT=true
+      - APP_DATABASE=zhigulbot
+      - APP_USER=zhigulbot_user
+      - APP_USER_PASSWORD=zhigulbot_password
+      - APP_PORT=5432
+      - CELERY_BROKER_URL=amqp://guest@zhigultoken-rabbitmq
+    hostname: "zhigultoken-celery"
+    networks:
+      infranginx_default:
+        aliases:
+          - "zhigultoken-celery"
+    restart: unless-stopped

@@ -1,0 +1,10 @@
+env
+__pycache__
+secret.txt
+*.png
+.DS_Store
+data_raw.csv
+test.csv
+celerybeat-schedule.db
+.ipynb_checkpoints
+*.model
