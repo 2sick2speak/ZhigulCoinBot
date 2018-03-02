@@ -3,7 +3,7 @@ import enum
 
 # Get token
 with open('secret.txt', 'r') as secret_file:
-    TELEGRAM_TOKEN = secret_file.read()
+    TELEGRAM_TOKEN = secret_file.read().strip('\n')
 
 DB_URI = 'postgresql://{user}:{password}@{host}:{port}/{db_name}'.format(
     user=os.getenv('APP_USER', 'zhigulbot_user'),
